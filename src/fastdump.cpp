@@ -1,0 +1,31 @@
+#include <print>
+
+#include "string_arena.hpp"
+
+#include <decode.hpp>
+
+int main() {
+  auto instrs = std::to_array<uint32_t>({
+      0b1110'0000000'0'0000'0000'0000000'0'0000u,
+      0b1110'0000000'0'0001'0010'0000000'0'0000u,
+      0b1110'0000000'0'0001'0010'0000001'0'0000u,
+      0b1110'0000000'0'0001'0010'0000100'0'0100u,
+      0b1110'0000000'1'0001'0010'0000100'0'0111u,
+      0b0000'0000000'1'0001'0010'0000100'0'0111u,
+      0b1110'0010100'0'0000'0000'000000000001u,
+      0b1110'0000100'0'1101'0000'0000000'0'0100u,
+      0b1110'001010001111'0000'000000000100u,
+  });
+
+  char buf[1024];
+
+  for (auto instr : instrs) {
+    String_Arena arena(buf, sizeof(buf));
+    size_t idx = decode(instr);
+    printers[idx](arena, instr);
+    arena.append('\000');
+    std::println("{}", arena.str());
+  }
+
+  return 0;
+}
