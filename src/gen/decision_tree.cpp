@@ -142,7 +142,6 @@ Decision_Tree::Node* Decision_Tree::Leaf_Node::build(
 
   uint32_t mask = ((1u << (hi - lo + 1)) - 1) << lo;
 
-
   std::println("mask:           {:032b}", mask);
 
   uint32_t instr_count = static_cast<uint32_t>(set.count());
@@ -160,8 +159,7 @@ Decision_Tree::Node* Decision_Tree::Leaf_Node::build(
     std::println("                {:032b} : {:032b}", v, mask_value);
   }
 
-  return tree.alloc.new_object<Node>(
-      Leaf_Node{instrs_idxs, instr_count, mask});
+  return tree.alloc.new_object<Node>(Leaf_Node{instrs_idxs, instr_count, mask});
 }
 
 Decision_Tree::Decision_Tree(const Instruction_Masks& masks,

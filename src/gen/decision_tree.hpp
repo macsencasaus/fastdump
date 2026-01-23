@@ -2,7 +2,6 @@
 #define NODE_HPP
 
 #include <bitset>
-#include <fstream>
 #include <memory_resource>
 #include <variant>
 

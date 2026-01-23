@@ -7,7 +7,6 @@
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
-#include <print>
 #include <ranges>
 #include <string_view>
 
@@ -21,9 +20,13 @@ struct Segment {
     Rd,
     Rm,
     Rs,
-    IMM,         // immediate
+    IMM,   // immediate
+    CIMM,  // composite immediate (two immediate fields that are concatenated)
     SHIFT_IMM,   // barrel shift by immediate
     SHIFT_TYPE,  // barrel shift type (shift by register)
+    LSB,
+    MSB,
+    WIDTH,
   } kind;
 
   unsigned bit_length;
@@ -69,21 +72,38 @@ struct Instruction_Format {
 
   constexpr std::pair<Segment::Kind, uint32_t> mask(
       std::string_view var) const {
-    Segment::Kind kind = var == "s"      ? Segment::Kind::S
-                         : var == "c"    ? Segment::Kind::COND
-                         : var == "Rn"   ? Segment::Kind::Rn
-                         : var == "Rd"   ? Segment::Kind::Rd
-                         : var == "Rm"   ? Segment::Kind::Rm
-                         : var == "Rs"   ? Segment::Kind::Rs
-                         : var == "imm"  ? Segment::Kind::IMM
-                         : var == "simm" ? Segment::Kind::SHIFT_IMM
-                         : var == "type" ? Segment::Kind::SHIFT_TYPE
-                                         : Segment::Kind::NONE;
+    Segment::Kind kind = var == "s"       ? Segment::Kind::S
+                         : var == "c"     ? Segment::Kind::COND
+                         : var == "Rn"    ? Segment::Kind::Rn
+                         : var == "Rd"    ? Segment::Kind::Rd
+                         : var == "Rm"    ? Segment::Kind::Rm
+                         : var == "Rs"    ? Segment::Kind::Rs
+                         : var == "imm"   ? Segment::Kind::IMM
+                         : var == "cimm"  ? Segment::Kind::CIMM
+                         : var == "simm"  ? Segment::Kind::SHIFT_IMM
+                         : var == "type"  ? Segment::Kind::SHIFT_TYPE
+                         : var == "msb"   ? Segment::Kind::MSB
+                         : var == "lsb"   ? Segment::Kind::LSB
+                         : var == "width" ? Segment::Kind::WIDTH
+                                          : Segment::Kind::NONE;
 
-    if (kind == Segment::Kind::NONE) {
-      std::println("unknown var: {}", var);
-    }
     assert(kind != Segment::Kind::NONE);
+
+    // fields that are composition of other fields
+    if (kind == Segment::Kind::WIDTH || kind == Segment::Kind::CIMM) {
+      uint32_t mask = 0u;
+      for (const auto& [segment, segment_mask] :
+           std::views::zip(segments, masks)) {
+        if (kind == Segment::Kind::WIDTH &&
+            (segment.kind == Segment::Kind::LSB ||
+             segment.kind == Segment::Kind::MSB))
+          mask |= segment_mask;
+
+        if (kind == Segment::Kind::CIMM && segment.kind == Segment::Kind::IMM)
+          mask |= segment_mask;
+      }
+      return std::make_pair(kind, mask);
+    }
 
     for (const auto& [segment, mask] : std::views::zip(segments, masks)) {
       assert(segment.kind != Segment::Kind::NONE);

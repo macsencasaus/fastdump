@@ -8,7 +8,26 @@ static void emit_segment_printer(std::ofstream& f,
                                  uint32_t segment_mask) {
   int shift = std::countr_zero(segment_mask);
 
-  std::print(f, "  a = (instr & {:#032b}u) >> {};\n", segment_mask, shift);
+  // there are two masks
+  if (kind == Segment::Kind::WIDTH || kind == Segment::Kind::CIMM) {
+    int shift_first_mask = std::countr_zero(~segment_mask >> shift) + shift;
+    int shift2 =
+        std::countr_zero(segment_mask >> shift_first_mask) + shift_first_mask;
+
+    /* isolate first (lowest) contiguous range */
+    uint32_t first = segment_mask & -segment_mask;  // lowest set bit
+    uint32_t tmp = segment_mask + first;            // carry through first range
+    uint32_t range1 = (tmp ^ segment_mask) >> 1 | first;
+
+    /* second range is whatever is left */
+    uint32_t segment_mask2 = segment_mask & ~range1;
+
+    segment_mask = range1;
+
+    std::print(f, "  b = (instr & {:#034b}u) >> {};\n", segment_mask2, shift2);
+  }
+
+  std::print(f, "  a = (instr & {:#034b}u) >> {};\n", segment_mask, shift);
 
   switch (kind) {
     case Segment::Kind::NONE:
@@ -37,11 +56,22 @@ static void emit_segment_printer(std::ofstream& f,
         std::print(f, "  arena.appendu(a);\n");
       }
     } break;
+    case Segment::Kind::CIMM: {
+      std::print(f, "  arena.appendu((b << {}) | a);\n",
+                 std::popcount(segment_mask));
+    } break;
     case Segment::Kind::SHIFT_IMM: {
       std::print(f, "  arena.append(imm_shift_type_field[a]);\n");
     } break;
     case Segment::Kind::SHIFT_TYPE: {
       std::print(f, "  arena.append(shift_type_field[a]);\n");
+    } break;
+    case Segment::Kind::LSB:
+    case Segment::Kind::MSB: {
+      std::print(f, "  arena.appendu(a);\n");
+    } break;
+    case Segment::Kind::WIDTH: {
+      std::print(f, "  arena.appendu(b - a);\n");
     } break;
   }
 }
@@ -51,7 +81,7 @@ static void emit_printer(std::ofstream& f,
                          size_t id) {
   std::print(f,
              "static void print_{}(String_Arena &arena, uint32_t instr) {{\n"
-             "  uint32_t a;\n",
+             "  uint32_t a, b; (void)b;\n",
              id);
 
   auto emit_parser = [&](uint32_t idx) {
@@ -108,7 +138,7 @@ static void emit_printer(std::ofstream& f,
         continue;
       }
 
-      std::print(f, "if ((instr & {:#032b}u) == {:#032b}u) {{\n", node->mask,
+      std::print(f, "if ((instr & {:#034b}u) == {:#034b}u) {{\n", node->mask,
                  mask_value);
       emit_parser(idx);
       std::print(f, "}} else ");
@@ -130,7 +160,7 @@ void emit_code(std::ofstream& f, const Decision_Tree::Mask_Table& mask_table) {
   for (size_t i = 0; i < mask_table.masks.size(); ++i) {
     uint32_t m = mask_table.masks[i];
     ssize_t s_idx = mask_table.subtable_idxs[i];
-    std::println("  {:2}: {:032b} | {:2}", i, m, s_idx);
+    std::println("  {:2}: {:034b} | {:2}", i, m, s_idx);
   }
 
   std::println();
@@ -242,7 +272,7 @@ void emit_code(std::ofstream& f, const Decision_Tree::Mask_Table& mask_table) {
 
   std::print(f, "static constexpr uint32_t masks[] = {{\n");
   for (auto m : mask_table.masks) {
-    std::print(f, "  {:#032b}u,\n", m);
+    std::print(f, "  {:#034b}u,\n", m);
   }
   std::print(f, "}};\n");
 
