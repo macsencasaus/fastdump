@@ -21,6 +21,14 @@
 #define BOPT    {Segment::Kind::BOPT,       4}
 #define IOPT    {Segment::Kind::IOPT,       4}
 
+// coprocessor
+#define COPROC  {Segment::Kind::COPROC,     4}
+#define OPC1    {Segment::Kind::OPC1,       4}
+#define OPC2    {Segment::Kind::OPC2,       3}
+#define CRn     {Segment::Kind::CRn,        4}
+#define CRd     {Segment::Kind::CRd,        4}
+#define CRm     {Segment::Kind::CRm,        4}
+
 INST(   adc,   "adc<s><c>\t<Rd>, <Rn>, #<imm>",            {COND, B(0010101), S, Rn, Rd, IMM(12)})
 INSTALT(adc,   "adc<s><c>\t<Rd>, <Rn>, <Rm><simm>",        {COND, B(0000101), S, Rn, Rd, SIMM, B(0), Rm})
 INSTALT(adc,   "adc<s><c>\t<Rd>, <Rn>, <Rm>, <type> <Rs>", {COND, B(0000101), S, Rn, Rd, Rs, B(0), TYPE, B(1), Rm})
@@ -62,7 +70,8 @@ INST(   bx,    "bx<c>\t<Rm>",                              {COND, B(000100101111
 
 INST(   bxj,   "bxj<c>\t<Rm>",                             {COND, B(000100101111111111110010), Rm})
 
-// TODO: CDP, CDP2
+INST(   cdp,   "cdp<c>\tp<coproc>, #<opc1>, c<CRd>, c<CRn>, c<CRm>, #<opc2>", {COND, B(1110), OPC1, CRn, CRd, COPROC, OPC2, B(0), CRm})
+INST(   cdp2,  "cdp2\tp<coproc>, #<opc1>, c<CRd>, c<CRn>, c<CRm>, #<opc2>", {B(11111110), OPC1, CRn, CRd, COPROC, OPC2, B(0), CRm})
 
 INST(   clrex, "clrex",                                    {B(11110101011111111111000000011111)})
 
@@ -121,3 +130,11 @@ INST(   isb,   "isb\t<iopt>",                              {B(111101010111111111
 #undef MSB
 #undef BOPT
 #undef IOPT
+
+// coprocessor
+#undef COPROC
+#undef OPC1
+#undef OPC2
+#undef CRn
+#undef CRd
+#undef CRm

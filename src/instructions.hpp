@@ -9,6 +9,7 @@
 #include <cstdint>
 #include <ranges>
 #include <string_view>
+#include <print>
 
 struct Segment {
   enum class Kind {
@@ -29,6 +30,14 @@ struct Segment {
     WIDTH,
     BOPT,  // memory barrier option
     IOPT,  // instruction barrier option
+
+    // coprocessor
+    COPROC,
+    OPC1,
+    OPC2,
+    CRd,
+    CRn,
+    CRm,
   } kind;
 
   unsigned bit_length;
@@ -89,8 +98,19 @@ struct Instruction_Format {
                          : var == "width" ? Segment::Kind::WIDTH
                          : var == "bopt"  ? Segment::Kind::BOPT
                          : var == "iopt"  ? Segment::Kind::IOPT
-                                          : Segment::Kind::NONE;
 
+                         // coprocessor
+                         : var == "coproc" ? Segment::Kind::COPROC
+                         : var == "opc1"   ? Segment::Kind::OPC1
+                         : var == "opc2"   ? Segment::Kind::OPC2
+                         : var == "CRd"    ? Segment::Kind::CRd
+                         : var == "CRn"    ? Segment::Kind::CRn
+                         : var == "CRm"    ? Segment::Kind::CRm
+                                           : Segment::Kind::NONE;
+
+    if (kind == Segment::Kind::NONE) {
+      std::println("unknown var: {}", var);
+    }
     assert(kind != Segment::Kind::NONE);
 
     // fields that are composition of other fields

@@ -46,16 +46,6 @@ static void emit_segment_printer(std::ofstream& f,
     case Segment::Kind::Rs: {
       std::print(f, "  arena.append(general_reg_field[a]);\n");
     } break;
-    case Segment::Kind::IMM: {
-      if (std::popcount(segment_mask) == 12) {
-        std::print(f,
-                   "  uint32_t s = (a >> 8) * 2;\n"
-                   "  arena.appendu(std::rotr(a & 0xFFu, "
-                   "std::bit_cast<int32_t>(s)));\n");
-      } else {
-        std::print(f, "  arena.appendu(a);\n");
-      }
-    } break;
     case Segment::Kind::CIMM: {
       std::print(f, "  arena.appendu((b << {}) | a);\n",
                  std::popcount(segment_mask));
@@ -66,10 +56,6 @@ static void emit_segment_printer(std::ofstream& f,
     case Segment::Kind::SHIFT_TYPE: {
       std::print(f, "  arena.append(shift_type_field[a]);\n");
     } break;
-    case Segment::Kind::LSB:
-    case Segment::Kind::MSB: {
-      std::print(f, "  arena.appendu(a);\n");
-    } break;
     case Segment::Kind::WIDTH: {
       std::print(f, "  arena.appendu(b - a);\n");
     } break;
@@ -78,6 +64,32 @@ static void emit_segment_printer(std::ofstream& f,
     } break;
     case Segment::Kind::IOPT: {
       std::print(f, "  arena.append(ibarrier_option_field[a]);\n");
+    } break;
+
+      // appends the literal value
+
+    case Segment::Kind::IMM: {
+      if (std::popcount(segment_mask) == 12) {
+        std::print(f,
+                   "  uint32_t s = (a >> 8) * 2;\n"
+                   "  arena.appendu(std::rotr(a & 0xFFu, "
+                   "std::bit_cast<int32_t>(s)));\n");
+        break;
+      }
+    }
+    case Segment::Kind::LSB:
+    case Segment::Kind::MSB:
+
+    // coprocessor
+    case Segment::Kind::COPROC:
+    case Segment::Kind::OPC1:
+    case Segment::Kind::OPC2:
+    case Segment::Kind::CRd:
+    case Segment::Kind::CRn:
+    case Segment::Kind::CRm:
+
+    {
+      std::print(f, "  arena.appendu(a);\n");
     } break;
   }
 }
@@ -94,9 +106,9 @@ static void emit_printer(std::ofstream& f,
     const Instruction_Format& instr = instruction_formats[idx];
     const char* fmt = instr.fmt;
 
-    auto read_word = [](const char* str) -> std::string_view {
+    auto read_var = [](const char* str) -> std::string_view {
       const char* base = str;
-      for (; std::isalpha(*str); ++str)
+      for (; *str != '>'; ++str)
         ;
       return std::string_view(base, static_cast<size_t>(str - base));
     };
@@ -112,7 +124,7 @@ static void emit_printer(std::ofstream& f,
       char ch = *fmt;
       if (ch == '<') {
         ++fmt;
-        auto var = read_word(fmt);
+        auto var = read_var(fmt);
         // std::println("var: {}, {}", var, var.size());
         const auto [kind, segment_mask] = instr.mask(var);
 
