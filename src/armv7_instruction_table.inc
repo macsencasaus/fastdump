@@ -18,48 +18,90 @@
 #define TYPE    {Segment::Kind::SHIFT_TYPE, 2}
 #define LSB     {Segment::Kind::LSB,        5}
 #define MSB     {Segment::Kind::MSB,        5}
+#define BOPT    {Segment::Kind::BOPT,       4}
+#define IOPT    {Segment::Kind::IOPT,       4}
 
-INST(   adc,  "adc<s><c>\t<Rd>, <Rn>, #<imm>",            {COND, B(0010101), S, Rn, Rd, IMM(12)})
-INSTALT(adc,  "adc<s><c>\t<Rd>, <Rn>, <Rm><simm>",        {COND, B(0000101), S, Rn, Rd, SIMM, B(0), Rm})
-INSTALT(adc,  "adc<s><c>\t<Rd>, <Rn>, <Rm>, <type> <Rs>", {COND, B(0000101), S, Rn, Rd, Rs, B(0), TYPE, B(1), Rm})
+INST(   adc,   "adc<s><c>\t<Rd>, <Rn>, #<imm>",            {COND, B(0010101), S, Rn, Rd, IMM(12)})
+INSTALT(adc,   "adc<s><c>\t<Rd>, <Rn>, <Rm><simm>",        {COND, B(0000101), S, Rn, Rd, SIMM, B(0), Rm})
+INSTALT(adc,   "adc<s><c>\t<Rd>, <Rn>, <Rm>, <type> <Rs>", {COND, B(0000101), S, Rn, Rd, Rs, B(0), TYPE, B(1), Rm})
 
-INST(   add,  "add<s><c>\t<Rd>, <Rn>, #<imm>",            {COND, B(0010100), S, Rn, Rd, IMM(12)})
-INSTALT(add,  "add<s><c>\t<Rd>, <Rn>, <Rm><simm>",        {COND, B(0000100), S, Rn, Rd, SIMM, B(0), Rm})
-INSTALT(add,  "add<s><c>\t<Rd>, <Rn>, <Rm>, <type> <Rs>", {COND, B(0000100), S, Rn, Rd, Rs, B(0), TYPE, B(1), Rm})
-INSTALT(add,  "add<s><c>\t<Rd>, sp, #<imm>",              {COND, B(0010100), S, B(1101), Rd, IMM(12)})
-INSTALT(add,  "add<s><c>\t<Rd>, sp, <Rm><simm>",          {COND, B(0000100), S, B(1101), Rd, SIMM, B(0), Rm})
+INST(   add,   "add<s><c>\t<Rd>, <Rn>, #<imm>",            {COND, B(0010100), S, Rn, Rd, IMM(12)})
+INSTALT(add,   "add<s><c>\t<Rd>, <Rn>, <Rm><simm>",        {COND, B(0000100), S, Rn, Rd, SIMM, B(0), Rm})
+INSTALT(add,   "add<s><c>\t<Rd>, <Rn>, <Rm>, <type> <Rs>", {COND, B(0000100), S, Rn, Rd, Rs, B(0), TYPE, B(1), Rm})
+INSTALT(add,   "add<s><c>\t<Rd>, sp, #<imm>",              {COND, B(0010100), S, B(1101), Rd, IMM(12)})
+INSTALT(add,   "add<s><c>\t<Rd>, sp, <Rm><simm>",          {COND, B(0000100), S, B(1101), Rd, SIMM, B(0), Rm})
 
-INST(   adr,  "adr<c>\t<Rd>, label",                      {COND, B(001010001111), Rd, IMM(12)})
-INSTALT(adr,  "adr<c>\t<Rd>, label",                      {COND, B(001001001111), Rd, IMM(12)})
+INST(   adr,   "adr<c>\t<Rd>, label",                      {COND, B(001010001111), Rd, IMM(12)})
+INSTALT(adr,   "adr<c>\t<Rd>, label",                      {COND, B(001001001111), Rd, IMM(12)})
 
-INST(   and,  "and<s><c>\t<Rd>, <Rn>, #<imm>",            {COND, B(0010000), S, Rn, Rd, IMM(12)})
-INSTALT(and,  "and<s><c>\t<Rd>, <Rn>, <Rm><simm>",        {COND, B(0000000), S, Rn, Rd, SIMM, B(0), Rm})
-INSTALT(and,  "and<s><c>\t<Rd>, <Rn>, <Rm>, <type> <Rs>", {COND, B(0000000), S, Rn, Rd, Rs, B(0), TYPE, B(1), Rm})
+INST(   and,   "and<s><c>\t<Rd>, <Rn>, #<imm>",            {COND, B(0010000), S, Rn, Rd, IMM(12)})
+INSTALT(and,   "and<s><c>\t<Rd>, <Rn>, <Rm><simm>",        {COND, B(0000000), S, Rn, Rd, SIMM, B(0), Rm})
+INSTALT(and,   "and<s><c>\t<Rd>, <Rn>, <Rm>, <type> <Rs>", {COND, B(0000000), S, Rn, Rd, Rs, B(0), TYPE, B(1), Rm})
 
-INST(   asr,  "asr<s><c>\t<Rd>, <Rm>, #<imm>",            {COND, B(0001101), S, B(0000), Rd, IMM(5), B(100), Rm})
-INSTALT(asr,  "asr<s><c>\t<Rd>, <Rn>, <Rm>",              {COND, B(0001101), S, B(0000), Rd, Rm, B(0101), Rn})
+INST(   asr,   "asr<s><c>\t<Rd>, <Rm>, #<imm>",            {COND, B(0001101), S, B(0000), Rd, IMM(5), B(100), Rm})
+INSTALT(asr,   "asr<s><c>\t<Rd>, <Rn>, <Rm>",              {COND, B(0001101), S, B(0000), Rd, Rm, B(0101), Rn})
 
-INST(   b,    "b<c>\tlabel",                              {COND, B(1010), IMM(24)})
+INST(   b,     "b<c>\tlabel",                              {COND, B(1010), IMM(24)})
 
-INST(   bfc,  "bfc<c>\t<Rd>, #<lsb>, #<width>",           {COND, B(0111110), MSB, Rd, LSB, B(0011111)})
-INST(   bfi,  "bfi<c>\t<Rd>, <Rn>, #<lsb>, #<width>",     {COND, B(0111110), MSB, Rd, LSB, B(001), Rn})
+INST(   bfc,   "bfc<c>\t<Rd>, #<lsb>, #<width>",           {COND, B(0111110), MSB, Rd, LSB, B(0011111)})
+INST(   bfi,   "bfi<c>\t<Rd>, <Rn>, #<lsb>, #<width>",     {COND, B(0111110), MSB, Rd, LSB, B(001), Rn})
 
-INST(   bic,  "bic<s><c>\t<Rd>, <Rn>, #<imm>",            {COND, B(0011110), S, Rn, Rd, IMM(12)})
-INSTALT(bic,  "bic<s><c>\t<Rd>, <Rn>, <Rm><simm>",        {COND, B(0001110), S, Rn, Rd, SIMM, B(0), Rm})
-INSTALT(bic,  "bic<s><c>\t<Rd>, <Rn>, <Rm>, <type> <Rs>", {COND, B(0001110), S, Rn, Rd, Rs, B(0), TYPE, B(1), Rm})
+INST(   bic,   "bic<s><c>\t<Rd>, <Rn>, #<imm>",            {COND, B(0011110), S, Rn, Rd, IMM(12)})
+INSTALT(bic,   "bic<s><c>\t<Rd>, <Rn>, <Rm><simm>",        {COND, B(0001110), S, Rn, Rd, SIMM, B(0), Rm})
+INSTALT(bic,   "bic<s><c>\t<Rd>, <Rn>, <Rm>, <type> <Rs>", {COND, B(0001110), S, Rn, Rd, Rs, B(0), TYPE, B(1), Rm})
 
-INST(   bkpt, "bkpt\t#<cimm>",                            {COND, B(00010010), IMM(12), B(0111), IMM(4)})
+INST(   bkpt,  "bkpt\t#<cimm>",                            {COND, B(00010010), IMM(12), B(0111), IMM(4)})
 
-INST(   bl,   "bl<c>\tlabel",                             {COND, B(1011), IMM(24)})
+INST(   bl,    "bl<c>\tlabel",                             {COND, B(1011), IMM(24)})
 
 // TODO: define H
-INST(   blx,  "blx\tlabel",                               {B(1111101), IMM(25)})
-INSTALT(blx,  "blx<c>\t<Rm>",                             {COND, B(000100101111111111110011), Rm})
+INST(   blx,   "blx\tlabel",                               {B(1111101), IMM(25)})
+INSTALT(blx,   "blx<c>\t<Rm>",                             {COND, B(000100101111111111110011), Rm})
 
-INST(   bx,   "bx<c>\t<Rm>",                              {COND, B(000100101111111111110001), Rm})
+INST(   bx,    "bx<c>\t<Rm>",                              {COND, B(000100101111111111110001), Rm})
 
-INST(   bxj,  "bxj<c>\t<Rm>",                             {COND, B(000100101111111111110010), Rm})
+INST(   bxj,   "bxj<c>\t<Rm>",                             {COND, B(000100101111111111110010), Rm})
 
+// TODO: CDP, CDP2
+
+INST(   clrex, "clrex",                                    {B(11110101011111111111000000011111)})
+
+INST(   clz,   "clz<c>\t<Rd>, <Rm>",                       {COND, B(000101101111), Rd, B(11110001), Rm})
+
+INST(   cmn,   "cmn<c>\t<Rn>, #<imm>",                     {COND, B(00110111), Rn, B(0000), IMM(12)})
+INSTALT(cmn,   "cmn<c>\t<Rn>, <Rm><simm>",                 {COND, B(00010111), Rn, B(0000), SIMM, B(0), Rm})
+INSTALT(cmn,   "cmn<c>\t<Rn>, <Rm>, <type> <Rs>",          {COND, B(00010111), Rn, B(0000), Rs, B(0), TYPE, B(1), Rm})
+
+INST(   cmp,   "cmp<c>\t<Rn>, #<imm>",                     {COND, B(00110101), Rn, B(0000), IMM(12)})
+INSTALT(cmp,   "cmp<c>\t<Rn>, <Rm><simm>",                 {COND, B(00010101), Rn, B(0000), SIMM, B(0), Rm})
+INSTALT(cmp,   "cmp<c>\t<Rn>, <Rm>, <type> <Rs>",          {COND, B(00010101), Rn, B(0000), Rs, B(0), TYPE, B(1), Rm})
+
+// TODO: CPS
+
+INST(   csdb,  "csdb<c>",                                  {COND, B(0011001000001111000000010100)})
+
+INST(   dbg,   "dbg<c>\t#<imm>",                           {COND, B(001100100000111100001111), IMM(4)})
+
+INST(   dmb,   "dmb\t<bopt>",                              {B(1111010101111111111100000101), BOPT})
+INST(   dsb,   "dsb\t<bopt>",                              {B(1111010101111111111100000100), BOPT})
+
+// TODO: ENTERX
+
+INST(   eor,   "eor<s><c>\t<Rd>, <Rn>, #<imm>",            {COND, B(0010001), S, Rn, Rd, IMM(12)})
+INSTALT(eor,   "eor<s><c>\t<Rd>, <Rn>, <Rm><simm>",        {COND, B(0000001), S, Rn, Rd, SIMM, B(0), Rm})
+INSTALT(eor,   "eor<s><c>\t<Rd>, <Rn>, <Rm>, <type> <Rs>", {COND, B(0000001), S, Rn, Rd, Rs, B(0), TYPE, B(1), Rm})
+
+// TODO: ERET
+
+// TODO: F?
+
+// TODO: HB..
+
+// TODO: HVC
+
+INST(   isb,   "isb\t<iopt>",                              {B(1111010101111111111100000110), IOPT})
+
+// TODO: IT
 
 #undef INST
 #undef INSTALT
@@ -72,7 +114,10 @@ INST(   bxj,  "bxj<c>\t<Rm>",                             {COND, B(0001001011111
 #undef Rm
 #undef Rs
 #undef IMM
+#undef CIMM
 #undef SIMM
 #undef TYPE
 #undef LSB
 #undef MSB
+#undef BOPT
+#undef IOPT

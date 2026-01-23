@@ -73,6 +73,12 @@ static void emit_segment_printer(std::ofstream& f,
     case Segment::Kind::WIDTH: {
       std::print(f, "  arena.appendu(b - a);\n");
     } break;
+    case Segment::Kind::BOPT: {
+      std::print(f, "  arena.append(barrier_option_field[a]);\n");
+    } break;
+    case Segment::Kind::IOPT: {
+      std::print(f, "  arena.append(ibarrier_option_field[a]);\n");
+    } break;
   }
 }
 
@@ -81,7 +87,7 @@ static void emit_printer(std::ofstream& f,
                          size_t id) {
   std::print(f,
              "static void print_{}(String_Arena &arena, uint32_t instr) {{\n"
-             "  uint32_t a, b; (void)b;\n",
+             "  uint32_t a, b; (void)instr; (void)a; (void)b;\n",
              id);
 
   auto emit_parser = [&](uint32_t idx) {
@@ -266,6 +272,46 @@ void emit_code(std::ofstream& f, const Decision_Tree::Mask_Table& mask_table) {
              "  \"lsr\",\n"
              "  \"asr\",\n"
              "  \"ror\",\n"
+             "}};\n");
+
+  std::print(f,
+             "static constexpr const char *barrier_option_field[] = {{\n"
+             "  \"#0\",\n"
+             "  \"#1\",\n"
+             "  \"oshst\",\n"
+             "  \"osh\",\n"
+             "  \"#4\",\n"
+             "  \"#5\",\n"
+             "  \"nshst\",\n"
+             "  \"nsh\",\n"
+             "  \"#8\",\n"
+             "  \"#9\",\n"
+             "  \"ishst\",\n"
+             "  \"ish\",\n"
+             "  \"#12\",\n"
+             "  \"#13\",\n"
+             "  \"st\",\n"
+             "  \"sy\",\n"
+             "}};\n");
+
+  std::print(f,
+             "static constexpr const char *ibarrier_option_field[] = {{\n"
+             "  \"#0\",\n"
+             "  \"#1\",\n"
+             "  \"#2\",\n"
+             "  \"#3\",\n"
+             "  \"#4\",\n"
+             "  \"#5\",\n"
+             "  \"#6\",\n"
+             "  \"#7\",\n"
+             "  \"#8\",\n"
+             "  \"#9\",\n"
+             "  \"#10\",\n"
+             "  \"#11\",\n"
+             "  \"#12\",\n"
+             "  \"#13\",\n"
+             "  \"#14\",\n"
+             "  \"sy\",\n"
              "}};\n");
 
   std::print(f, "\n");

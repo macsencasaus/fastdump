@@ -27,6 +27,8 @@ struct Segment {
     LSB,
     MSB,
     WIDTH,
+    BOPT,  // memory barrier option
+    IOPT,  // instruction barrier option
   } kind;
 
   unsigned bit_length;
@@ -62,7 +64,7 @@ struct Instruction_Format {
 
       assert(segment.bit_length > 0);
 
-      uint32_t bits = (1u << segment.bit_length) - 1;
+      uint32_t bits = static_cast<uint32_t>((1ull << segment.bit_length) - 1);
       cur_mask = bits << (static_cast<uint32_t>(std::countr_zero(cur_mask)) -
                           segment.bit_length);
 
@@ -85,6 +87,8 @@ struct Instruction_Format {
                          : var == "msb"   ? Segment::Kind::MSB
                          : var == "lsb"   ? Segment::Kind::LSB
                          : var == "width" ? Segment::Kind::WIDTH
+                         : var == "bopt"  ? Segment::Kind::BOPT
+                         : var == "iopt"  ? Segment::Kind::IOPT
                                           : Segment::Kind::NONE;
 
     assert(kind != Segment::Kind::NONE);
@@ -146,7 +150,7 @@ struct Instruction_Mask {
 
       if (segment.kind == Segment::Kind::BITS) {
         value |= (segment.value) << i;
-        mask |= ((1u << segment.bit_length) - 1u) << i;
+        mask |= static_cast<uint32_t>(((1ull << segment.bit_length) - 1u) << i);
       }
     }
 
