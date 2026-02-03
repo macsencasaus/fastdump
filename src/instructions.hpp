@@ -7,9 +7,9 @@
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
+#include <print>
 #include <ranges>
 #include <string_view>
-#include <print>
 
 struct Segment {
   enum class Kind {
@@ -21,6 +21,7 @@ struct Segment {
     Rd,
     Rm,
     Rs,
+    CONST,  // 12 bit modified constant
     IMM,   // immediate
     CIMM,  // composite immediate (two immediate fields that are concatenated)
     SHIFT_IMM,   // barrel shift by immediate
@@ -30,6 +31,8 @@ struct Segment {
     WIDTH,
     BOPT,  // memory barrier option
     IOPT,  // instruction barrier option
+
+    REGS,  // register list
 
     // coprocessor
     COPROC,
@@ -89,6 +92,7 @@ struct Instruction_Format {
                          : var == "Rd"    ? Segment::Kind::Rd
                          : var == "Rm"    ? Segment::Kind::Rm
                          : var == "Rs"    ? Segment::Kind::Rs
+                         : var == "const" ? Segment::Kind::CONST
                          : var == "imm"   ? Segment::Kind::IMM
                          : var == "cimm"  ? Segment::Kind::CIMM
                          : var == "simm"  ? Segment::Kind::SHIFT_IMM
@@ -98,6 +102,8 @@ struct Instruction_Format {
                          : var == "width" ? Segment::Kind::WIDTH
                          : var == "bopt"  ? Segment::Kind::BOPT
                          : var == "iopt"  ? Segment::Kind::IOPT
+
+                         : var == "regs" ? Segment::Kind::REGS
 
                          // coprocessor
                          : var == "coproc" ? Segment::Kind::COPROC

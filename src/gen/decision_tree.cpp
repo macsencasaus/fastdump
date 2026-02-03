@@ -140,7 +140,7 @@ Decision_Tree::Node* Decision_Tree::Leaf_Node::build(
   int lo = std::countr_zero(discriminating_bits);
   int hi = 31 - std::countl_zero(discriminating_bits);
 
-  uint32_t mask = ((1u << (hi - lo + 1)) - 1) << lo;
+  uint32_t mask = static_cast<uint32_t>(((1ull << (hi - lo + 1)) - 1) << lo);
 
   std::println("mask:           {:032b}", mask);
 
@@ -153,7 +153,7 @@ Decision_Tree::Node* Decision_Tree::Leaf_Node::build(
     if (!set[i])
       continue;
     uint32_t v = tree.masks[i].value;
-    uint32_t mask_value = discriminating_bits & v;
+    uint32_t mask_value = mask & v;
     instrs_idxs[ch++] = std::make_pair(mask_value, i);
 
     std::println("                {:032b} : {:032b}", v, mask_value);

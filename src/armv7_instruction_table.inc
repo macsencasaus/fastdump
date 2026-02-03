@@ -13,6 +13,7 @@
 #define Rd      {Segment::Kind::Rd,         4}
 #define Rm      {Segment::Kind::Rm,         4}
 #define Rs      {Segment::Kind::Rs,         4}
+#define CONST   {Segment::Kind::CONST,     12}
 #define IMM(v)  {Segment::Kind::IMM,        v}
 #define SIMM    {Segment::Kind::SHIFT_IMM,  7}
 #define TYPE    {Segment::Kind::SHIFT_TYPE, 2}
@@ -20,6 +21,8 @@
 #define MSB     {Segment::Kind::MSB,        5}
 #define BOPT    {Segment::Kind::BOPT,       4}
 #define IOPT    {Segment::Kind::IOPT,       4}
+
+#define REGS    {Segment::Kind::REGS,      16}
 
 // coprocessor
 #define COPROC  {Segment::Kind::COPROC,     4}
@@ -29,20 +32,20 @@
 #define CRd     {Segment::Kind::CRd,        4}
 #define CRm     {Segment::Kind::CRm,        4}
 
-INST(   adc,   "adc<s><c>\t<Rd>, <Rn>, #<imm>",            {COND, B(0010101), S, Rn, Rd, IMM(12)})
+INST(   adc,   "adc<s><c>\t<Rd>, <Rn>, #<const>",          {COND, B(0010101), S, Rn, Rd, CONST})
 INSTALT(adc,   "adc<s><c>\t<Rd>, <Rn>, <Rm><simm>",        {COND, B(0000101), S, Rn, Rd, SIMM, B(0), Rm})
 INSTALT(adc,   "adc<s><c>\t<Rd>, <Rn>, <Rm>, <type> <Rs>", {COND, B(0000101), S, Rn, Rd, Rs, B(0), TYPE, B(1), Rm})
 
-INST(   add,   "add<s><c>\t<Rd>, <Rn>, #<imm>",            {COND, B(0010100), S, Rn, Rd, IMM(12)})
+INST(   add,   "add<s><c>\t<Rd>, <Rn>, #<const>",          {COND, B(0010100), S, Rn, Rd, CONST})
 INSTALT(add,   "add<s><c>\t<Rd>, <Rn>, <Rm><simm>",        {COND, B(0000100), S, Rn, Rd, SIMM, B(0), Rm})
 INSTALT(add,   "add<s><c>\t<Rd>, <Rn>, <Rm>, <type> <Rs>", {COND, B(0000100), S, Rn, Rd, Rs, B(0), TYPE, B(1), Rm})
-INSTALT(add,   "add<s><c>\t<Rd>, sp, #<imm>",              {COND, B(0010100), S, B(1101), Rd, IMM(12)})
+INSTALT(add,   "add<s><c>\t<Rd>, sp, #<const>",            {COND, B(0010100), S, B(1101), Rd, CONST})
 INSTALT(add,   "add<s><c>\t<Rd>, sp, <Rm><simm>",          {COND, B(0000100), S, B(1101), Rd, SIMM, B(0), Rm})
 
-INST(   adr,   "adr<c>\t<Rd>, label",                      {COND, B(001010001111), Rd, IMM(12)})
-INSTALT(adr,   "adr<c>\t<Rd>, label",                      {COND, B(001001001111), Rd, IMM(12)})
+INST(   adr,   "adr<c>\t<Rd>, label",                      {COND, B(001010001111), Rd, CONST})
+INSTALT(adr,   "adr<c>\t<Rd>, label",                      {COND, B(001001001111), Rd, CONST})
 
-INST(   and,   "and<s><c>\t<Rd>, <Rn>, #<imm>",            {COND, B(0010000), S, Rn, Rd, IMM(12)})
+INST(   and,   "and<s><c>\t<Rd>, <Rn>, #<const>",          {COND, B(0010000), S, Rn, Rd, CONST})
 INSTALT(and,   "and<s><c>\t<Rd>, <Rn>, <Rm><simm>",        {COND, B(0000000), S, Rn, Rd, SIMM, B(0), Rm})
 INSTALT(and,   "and<s><c>\t<Rd>, <Rn>, <Rm>, <type> <Rs>", {COND, B(0000000), S, Rn, Rd, Rs, B(0), TYPE, B(1), Rm})
 
@@ -54,7 +57,7 @@ INST(   b,     "b<c>\tlabel",                              {COND, B(1010), IMM(2
 INST(   bfc,   "bfc<c>\t<Rd>, #<lsb>, #<width>",           {COND, B(0111110), MSB, Rd, LSB, B(0011111)})
 INST(   bfi,   "bfi<c>\t<Rd>, <Rn>, #<lsb>, #<width>",     {COND, B(0111110), MSB, Rd, LSB, B(001), Rn})
 
-INST(   bic,   "bic<s><c>\t<Rd>, <Rn>, #<imm>",            {COND, B(0011110), S, Rn, Rd, IMM(12)})
+INST(   bic,   "bic<s><c>\t<Rd>, <Rn>, #<const>",          {COND, B(0011110), S, Rn, Rd, CONST})
 INSTALT(bic,   "bic<s><c>\t<Rd>, <Rn>, <Rm><simm>",        {COND, B(0001110), S, Rn, Rd, SIMM, B(0), Rm})
 INSTALT(bic,   "bic<s><c>\t<Rd>, <Rn>, <Rm>, <type> <Rs>", {COND, B(0001110), S, Rn, Rd, Rs, B(0), TYPE, B(1), Rm})
 
@@ -71,17 +74,17 @@ INST(   bx,    "bx<c>\t<Rm>",                              {COND, B(000100101111
 INST(   bxj,   "bxj<c>\t<Rm>",                             {COND, B(000100101111111111110010), Rm})
 
 INST(   cdp,   "cdp<c>\tp<coproc>, #<opc1>, c<CRd>, c<CRn>, c<CRm>, #<opc2>", {COND, B(1110), OPC1, CRn, CRd, COPROC, OPC2, B(0), CRm})
-INST(   cdp2,  "cdp2\tp<coproc>, #<opc1>, c<CRd>, c<CRn>, c<CRm>, #<opc2>", {B(11111110), OPC1, CRn, CRd, COPROC, OPC2, B(0), CRm})
+INST(   cdp2,  "cdp2\tp<coproc>, #<opc1>, c<CRd>, c<CRn>, c<CRm>, #<opc2>",   {B(11111110), OPC1, CRn, CRd, COPROC, OPC2, B(0), CRm})
 
 INST(   clrex, "clrex",                                    {B(11110101011111111111000000011111)})
 
 INST(   clz,   "clz<c>\t<Rd>, <Rm>",                       {COND, B(000101101111), Rd, B(11110001), Rm})
 
-INST(   cmn,   "cmn<c>\t<Rn>, #<imm>",                     {COND, B(00110111), Rn, B(0000), IMM(12)})
+INST(   cmn,   "cmn<c>\t<Rn>, #<const>",                   {COND, B(00110111), Rn, B(0000), CONST})
 INSTALT(cmn,   "cmn<c>\t<Rn>, <Rm><simm>",                 {COND, B(00010111), Rn, B(0000), SIMM, B(0), Rm})
 INSTALT(cmn,   "cmn<c>\t<Rn>, <Rm>, <type> <Rs>",          {COND, B(00010111), Rn, B(0000), Rs, B(0), TYPE, B(1), Rm})
 
-INST(   cmp,   "cmp<c>\t<Rn>, #<imm>",                     {COND, B(00110101), Rn, B(0000), IMM(12)})
+INST(   cmp,   "cmp<c>\t<Rn>, #<const>",                   {COND, B(00110101), Rn, B(0000), CONST})
 INSTALT(cmp,   "cmp<c>\t<Rn>, <Rm><simm>",                 {COND, B(00010101), Rn, B(0000), SIMM, B(0), Rm})
 INSTALT(cmp,   "cmp<c>\t<Rn>, <Rm>, <type> <Rs>",          {COND, B(00010101), Rn, B(0000), Rs, B(0), TYPE, B(1), Rm})
 
@@ -96,7 +99,7 @@ INST(   dsb,   "dsb\t<bopt>",                              {B(111101010111111111
 
 // TODO: ENTERX
 
-INST(   eor,   "eor<s><c>\t<Rd>, <Rn>, #<imm>",            {COND, B(0010001), S, Rn, Rd, IMM(12)})
+INST(   eor,   "eor<s><c>\t<Rd>, <Rn>, #<const>",          {COND, B(0010001), S, Rn, Rd, CONST})
 INSTALT(eor,   "eor<s><c>\t<Rd>, <Rn>, <Rm><simm>",        {COND, B(0000001), S, Rn, Rd, SIMM, B(0), Rm})
 INSTALT(eor,   "eor<s><c>\t<Rd>, <Rn>, <Rm>, <type> <Rs>", {COND, B(0000001), S, Rn, Rd, Rs, B(0), TYPE, B(1), Rm})
 
@@ -112,16 +115,72 @@ INST(   isb,   "isb\t<iopt>",                              {B(111101010111111111
 
 // TODO: IT
 
+// TODO: LDC, LDC2 (add P, U, D, W)
+
+INST(   ldm,   "ldm<c>\t<Rn>, <regs>",                     {COND, B(10001001), Rn, REGS})
+INSTALT(ldm,   "ldm<c>\t<Rn>!, <regs>",                    {COND, B(10001011), Rn, REGS})
+
+INST(   ldmda, "ldmda<c>\t<Rn>, <regs>",                   {COND, B(10000001), Rn, REGS})
+INSTALT(ldmda, "ldmda<c>\t<Rn>!, <regs>",                  {COND, B(10000011), Rn, REGS})
+
+INST(   ldmdb, "ldmdb<c>\t<Rn>, <regs>",                   {COND, B(10010001), Rn, REGS})
+INSTALT(ldmdb, "ldmdb<c>\t<Rn>!, <regs>",                  {COND, B(10010011), Rn, REGS})
+
+INST(   ldmib, "ldmib<c>\t<Rn>, <regs>",                   {COND, B(10011001), Rn, REGS})
+INSTALT(ldmib, "ldmib<c>\t<Rn>!, <regs>",                  {COND, B(10011011), Rn, REGS})
+
+// TODO: maybe add a special case for imm == 0
+INST(   ldr,   "ldr<c>\t<Rs>, [<Rn>, #<imm>]",             {COND, B(01011001), Rn, Rs, IMM(12)})
+INSTALT(ldr,   "ldr<c>\t<Rs>, [<Rn>, #-<imm>]",            {COND, B(01010001), Rn, Rs, IMM(12)})
+INSTALT(ldr,   "ldr<c>\t<Rs>, [<Rn>, #<imm>]!",            {COND, B(01011011), Rn, Rs, IMM(12)})
+INSTALT(ldr,   "ldr<c>\t<Rs>, [<Rn>, #-<imm>]!",           {COND, B(01010011), Rn, Rs, IMM(12)})
+INSTALT(ldr,   "ldr<c>\t<Rs>, [<Rn>], #<imm>",             {COND, B(01001001), Rn, Rs, IMM(12)})
+INSTALT(ldr,   "ldr<c>\t<Rs>, [<Rn>], #-<imm>",            {COND, B(01000001), Rn, Rs, IMM(12)})
+
+INSTALT(ldr,   "ldr<c>\t<Rs>, label",                      {COND, B(010110011111), Rs, IMM(12)})
+INSTALT(ldr,   "ldr<c>\t<Rs>, -label",                     {COND, B(010100011111), Rs, IMM(12)})
+
+INSTALT(ldr,   "ldr<c>\t<Rs>, [<Rn>, <Rm><simm>]",         {COND, B(01111001), Rn, Rs, SIMM, B(0), Rm})
+INSTALT(ldr,   "ldr<c>\t<Rs>, [<Rn>, -<Rm><simm>]",        {COND, B(01110001), Rn, Rs, SIMM, B(0), Rm})
+INSTALT(ldr,   "ldr<c>\t<Rs>, [<Rn>, <Rm><simm>]!",        {COND, B(01111011), Rn, Rs, SIMM, B(0), Rm})
+INSTALT(ldr,   "ldr<c>\t<Rs>, [<Rn>, -<Rm><simm>]!",       {COND, B(01110011), Rn, Rs, SIMM, B(0), Rm})
+INSTALT(ldr,   "ldr<c>\t<Rs>, [<Rn>], <Rm><simm>",         {COND, B(01101001), Rn, Rs, SIMM, B(0), Rm})
+INSTALT(ldr,   "ldr<c>\t<Rs>, [<Rn>], -<Rm><simm>",        {COND, B(01100001), Rn, Rs, SIMM, B(0), Rm})
+
+INST(   ldrb,  "ldrb<c>\t<Rs>, [<Rn>, #<imm>]",            {COND, B(01011101), Rn, Rs, IMM(12)})
+INSTALT(ldrb,  "ldrb<c>\t<Rs>, [<Rn>, #-<imm>]",           {COND, B(01010101), Rn, Rs, IMM(12)})
+INSTALT(ldrb,  "ldrb<c>\t<Rs>, [<Rn>, #<imm>]!",           {COND, B(01011111), Rn, Rs, IMM(12)})
+INSTALT(ldrb,  "ldrb<c>\t<Rs>, [<Rn>, #-<imm>]!",          {COND, B(01010111), Rn, Rs, IMM(12)})
+INSTALT(ldrb,  "ldrb<c>\t<Rs>, [<Rn>], #<imm>",            {COND, B(01001101), Rn, Rs, IMM(12)})
+INSTALT(ldrb,  "ldrb<c>\t<Rs>, [<Rn>], #-<imm>",           {COND, B(01000101), Rn, Rs, IMM(12)})
+
+INSTALT(ldrb,  "ldrb<c>\t<Rs>, label",                     {COND, B(010111011111), Rs, IMM(12)})
+INSTALT(ldrb,  "ldrb<c>\t<Rs>, -label",                    {COND, B(010101011111), Rs, IMM(12)})
+
+INSTALT(ldrb,  "ldrb<c>\t<Rs>, [<Rn>, <Rm><simm>]",        {COND, B(01111101), Rn, Rs, SIMM, B(0), Rm})
+INSTALT(ldrb,  "ldrb<c>\t<Rs>, [<Rn>, -<Rm><simm>]",       {COND, B(01110101), Rn, Rs, SIMM, B(0), Rm})
+INSTALT(ldrb,  "ldrb<c>\t<Rs>, [<Rn>, <Rm><simm>]!",       {COND, B(01111111), Rn, Rs, SIMM, B(0), Rm})
+INSTALT(ldrb,  "ldrb<c>\t<Rs>, [<Rn>, -<Rm><simm>]!",      {COND, B(01110111), Rn, Rs, SIMM, B(0), Rm})
+INSTALT(ldrb,  "ldrb<c>\t<Rs>, [<Rn>], <Rm><simm>",        {COND, B(01101101), Rn, Rs, SIMM, B(0), Rm})
+INSTALT(ldrb,  "ldrb<c>\t<Rs>, [<Rn>], -<Rm><simm>",       {COND, B(01100101), Rn, Rs, SIMM, B(0), Rm})
+
+INST(   ldrbt, "ldrbt<c>\t<Rs>, [<Rn>], #<imm>",           {COND, B(01001111), Rn, Rs, IMM(12)})
+INSTALT(ldrbt, "ldrbt<c>\t<Rs>, [<Rn>], #-<imm>",          {COND, B(01000111), Rn, Rs, IMM(12)})
+INSTALT(ldrbt, "ldrbt<c>\t<Rs>, [<Rn>], <Rm><simm>",       {COND, B(01101111), Rn, Rs, SIMM, B(0), Rm})
+INSTALT(ldrbt, "ldrbt<c>\t<Rs>, [<Rn>], -<Rm><simm>",      {COND, B(01100111), Rn, Rs, SIMM, B(0), Rm})
+
 #undef INST
 #undef INSTALT
 
 #undef B
 #undef S
+#undef W
 #undef COND
 #undef Rn
 #undef Rd
 #undef Rm
 #undef Rs
+#undef CONST
 #undef IMM
 #undef CIMM
 #undef SIMM
@@ -130,6 +189,8 @@ INST(   isb,   "isb\t<iopt>",                              {B(111101010111111111
 #undef MSB
 #undef BOPT
 #undef IOPT
+
+#undef REGS
 
 // coprocessor
 #undef COPROC

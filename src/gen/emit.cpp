@@ -35,7 +35,7 @@ static void emit_segment_printer(std::ofstream& f,
       assert(false);
 
     case Segment::Kind::S: {
-      std::print(f, "  if (a) arena.append('s');\n", segment_mask);
+      std::print(f, "  if (a) arena.append('s');\n");
     } break;
     case Segment::Kind::COND: {
       std::print(f, "  arena.append(condition_field[a]);\n");
@@ -45,6 +45,12 @@ static void emit_segment_printer(std::ofstream& f,
     case Segment::Kind::Rm:
     case Segment::Kind::Rs: {
       std::print(f, "  arena.append(general_reg_field[a]);\n");
+    } break;
+    case Segment::Kind::CONST: {
+      std::print(f,
+                 "  uint32_t s = (a >> 8) * 2;\n"
+                 "  arena.appendu(std::rotr(a & 0xFFu, "
+                 "std::bit_cast<int32_t>(s)));\n");
     } break;
     case Segment::Kind::CIMM: {
       std::print(f, "  arena.appendu((b << {}) | a);\n",
@@ -66,17 +72,19 @@ static void emit_segment_printer(std::ofstream& f,
       std::print(f, "  arena.append(ibarrier_option_field[a]);\n");
     } break;
 
-      // appends the literal value
+    case Segment::Kind::REGS: {
+      std::print(f, "  arena.append('{{');\n");
+      std::print(f,
+                 "  #pragma clang loop unroll(full)\n"
+                 "  for (size_t i = 0; i < 16; ++i) {{\n"
+                 "    if (i != 0) arena.append(\", \");\n"
+                 "    if (a & (1u << i)) arena.append(general_reg_field[i]);\n"
+                 "  }}\n");
+      std::print(f, "  arena.append('}}');\n");
+    } break;
 
-    case Segment::Kind::IMM: {
-      if (std::popcount(segment_mask) == 12) {
-        std::print(f,
-                   "  uint32_t s = (a >> 8) * 2;\n"
-                   "  arena.appendu(std::rotr(a & 0xFFu, "
-                   "std::bit_cast<int32_t>(s)));\n");
-        break;
-      }
-    }
+    // appends the literal value
+    case Segment::Kind::IMM:
     case Segment::Kind::LSB:
     case Segment::Kind::MSB:
 

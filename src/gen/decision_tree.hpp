@@ -14,7 +14,7 @@ struct Decision_Tree {
   struct Leaf_Node;
   using Node = std::variant<General_Node, Leaf_Node>;
 
-  static constexpr uint32_t mask_max_bit_width = 3u;
+  static constexpr uint32_t mask_max_bit_width = 4u;
 
   struct General_Node {
     std::array<Node*, 1u << mask_max_bit_width> children;
