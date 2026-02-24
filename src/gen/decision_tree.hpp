@@ -38,9 +38,9 @@ struct Decision_Tree {
   };
 
   struct Mask_Table {
-    std::vector<uint32_t> masks{};
-    std::vector<ssize_t> subtable_idxs{};
-    std::vector<const Leaf_Node*> leafs{};
+    std::vector<uint32_t> masks;
+    std::vector<ssize_t> subtable_idxs;
+    std::vector<const Leaf_Node*> leafs;
   };
 
   struct Table_Builder {
