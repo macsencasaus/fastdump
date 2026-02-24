@@ -151,11 +151,11 @@ static void emit_printer(std::ofstream& f,
     }
   };
 
-  if (node->instr_count == 1) {
-    emit_parser(node->instr_idxs->second);
+  if (node->instr_idxs.size() == 1) {
+    emit_parser(node->instr_idxs[0].second);
   } else {
     uint32_t else_idx;
-    for (size_t i = 0; i < node->instr_count; ++i) {
+    for (size_t i = 0; i < node->instr_idxs.size(); ++i) {
       uint32_t mask_value = node->instr_idxs[i].first;
       uint32_t idx = node->instr_idxs[i].second;
 
@@ -194,7 +194,7 @@ void emit_code(std::ofstream& f, const Decision_Tree::Mask_Table& mask_table) {
   for (size_t i = 0; i < mask_table.leafs.size(); ++i) {
     auto ln = mask_table.leafs[i];
     std::print("  {:2} {{", i);
-    for (size_t j = 0; j < ln->instr_count; ++j) {
+    for (size_t j = 0; j < ln->instr_idxs.size(); ++j) {
       if (j != 0)
         std::print(", ");
       std::print("{}", ln->instr_idxs[j].second);

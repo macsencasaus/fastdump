@@ -28,8 +28,8 @@ struct Decision_Tree {
   };
 
   struct Leaf_Node {
-    std::pair</* mask value */ uint32_t, /* idx */ uint32_t>* instr_idxs;
-    uint32_t instr_count;
+    std::span<std::pair</* mask value */ uint32_t, /* idx */ uint32_t>>
+        instr_idxs;
     uint32_t mask;
 
     static Node* build(Decision_Tree& tree, uint32_t idx);

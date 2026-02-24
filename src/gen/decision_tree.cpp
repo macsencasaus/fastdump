@@ -16,6 +16,7 @@ Decision_Tree::Node* Decision_Tree::General_Node::build(
     const std::bitset<instruction_count>& set) {
   std::println("--- General ---");
   std::println("set: {}", set.to_string());
+
   uint32_t allowed_bits = std::numeric_limits<uint32_t>::max();
 
   const auto& instr_masks = tree.masks;
@@ -111,7 +112,7 @@ Decision_Tree::Node* Decision_Tree::General_Node::build(
 Decision_Tree::Node* Decision_Tree::Leaf_Node::build(Decision_Tree& tree,
                                                      uint32_t idx) {
   auto instr = tree.alloc.new_object<std::pair<uint32_t, uint32_t>>(0, idx);
-  return tree.alloc.new_object<Node>(Leaf_Node{instr, 1, 0u});
+  return tree.alloc.new_object<Node>(Leaf_Node{std::span(instr, 1), 0u});
 }
 
 Decision_Tree::Node* Decision_Tree::Leaf_Node::build(
@@ -159,7 +160,8 @@ Decision_Tree::Node* Decision_Tree::Leaf_Node::build(
     std::println("                {:032b} : {:032b}", v, mask_value);
   }
 
-  return tree.alloc.new_object<Node>(Leaf_Node{instrs_idxs, instr_count, mask});
+  return tree.alloc.new_object<Node>(
+      Leaf_Node{std::span(instrs_idxs, instr_count), mask});
 }
 
 Decision_Tree::Decision_Tree(const Instruction_Masks& masks,
