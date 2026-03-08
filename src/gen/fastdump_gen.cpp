@@ -13,6 +13,16 @@
     abort();                                                               \
   } while (0)
 
+static constexpr auto construct_masks(const auto& instruction_formats) {
+  std::array<Instruction_Mask, instruction_formats.size()> masks;
+
+  for (size_t i = 0; i < masks.size(); ++i) {
+    masks[i] = Instruction_Mask::from(instruction_formats[i]);
+  }
+
+  return masks;
+}
+
 int main(int argc, char* argv[]) {
   if (argc < 2) {
     std::println(stderr, "Usage: {} output-file", argv[0]);
@@ -24,16 +34,17 @@ int main(int argc, char* argv[]) {
 
   std::ofstream f(filename);
 
-  std::array<Instruction_Mask, instruction_count> masks;
+  static constexpr auto masks = construct_masks(instruction_formats);
 
-  for (size_t i = 0; i < instruction_count; ++i) {
-    masks[i] = Instruction_Mask::from(instruction_formats[i]);
+  for (size_t i = 0; i < instruction_formats.size(); ++i) {
+    std::println("{:5} : {}", i, instruction_formats[i].fmt.begin());
   }
 
-  for (size_t i = 0; i < instruction_count; ++i) {
-    std::println("{:5} : {:032b}, {:032b}",
-                 armv7_instruction_str_lut[instruction_formats[i].instr],
-                 masks[i].mask, masks[i].value);
+  for (size_t i = 0; i < instruction_formats.size(); ++i) {
+    std::println(
+        "{:5} : {:032b}, {:032b}",
+        armv7_instruction_str_lut[instruction_formats[i].instr],
+        masks[i].mask, masks[i].value);
   }
 
   auto tree = Decision_Tree::build(masks);

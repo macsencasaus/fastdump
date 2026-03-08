@@ -8,6 +8,8 @@
 #include <instructions.hpp>
 
 struct Decision_Tree {
+  static constexpr size_t instruction_count = instruction_formats.size();
+
   using Instruction_Masks = std::array<Instruction_Mask, instruction_count>;
 
   struct General_Node;

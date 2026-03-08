@@ -37,6 +37,12 @@ static void emit_segment_printer(std::ofstream& f,
     case Segment::Kind::S: {
       std::print(f, "  if (a) arena.append('s');\n");
     } break;
+    case Segment::Kind::W: {
+      std::print(f, "  if (a) arena.append('!');\n");
+    } break;
+    case Segment::Kind::U: {
+      std::print(f, "  if (!a) arena.append('-');\n");
+    } break;
     case Segment::Kind::COND: {
       std::print(f, "  arena.append(condition_field[a]);\n");
     } break;
@@ -65,6 +71,7 @@ static void emit_segment_printer(std::ofstream& f,
     case Segment::Kind::WIDTH: {
       std::print(f, "  arena.appendu(b - a);\n");
     } break;
+
     case Segment::Kind::BOPT: {
       std::print(f, "  arena.append(barrier_option_field[a]);\n");
     } break;
@@ -112,7 +119,7 @@ static void emit_printer(std::ofstream& f,
 
   auto emit_parser = [&](uint32_t idx) {
     const Instruction_Format& instr = instruction_formats[idx];
-    const char* fmt = instr.fmt;
+    const char* fmt = instr.fmt.begin();
 
     auto read_var = [](const char* str) -> std::string_view {
       const char* base = str;
@@ -186,14 +193,14 @@ void emit_code(std::ofstream& f, const Decision_Tree::Mask_Table& mask_table) {
   for (size_t i = 0; i < mask_table.masks.size(); ++i) {
     uint32_t m = mask_table.masks[i];
     ssize_t s_idx = mask_table.subtable_idxs[i];
-    std::println("  {:2}: {:034b} | {:2}", i, m, s_idx);
+    std::println("  {:4}: {:034b} | {:2}", i, m, s_idx);
   }
 
   std::println();
 
   for (size_t i = 0; i < mask_table.leafs.size(); ++i) {
     auto ln = mask_table.leafs[i];
-    std::print("  {:2} {{", i);
+    std::print("  {:4} {{", i);
     for (size_t j = 0; j < ln->instr_idxs.size(); ++j) {
       if (j != 0)
         std::print(", ");
