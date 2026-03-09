@@ -8,6 +8,13 @@
 #include <cstddef>
 #include <string>
 
+#define UNREACHABLE()                                                      \
+  do {                                                                     \
+    fprintf(stderr, "UNREACHABLE CODE REACHED: %s:%d in %s()\n", __FILE__, \
+            __LINE__, __func__);                                           \
+    abort();                                                               \
+  } while (0)
+
 template <size_t M, size_t N>
 static consteval std::array<char, M> padded_string(const char (&str)[N]) {
   static_assert(M >= N, "target array too small");

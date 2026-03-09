@@ -15,6 +15,8 @@
 #define Rd      {Segment::Kind::Rd,         4}
 #define Rm      {Segment::Kind::Rm,         4}
 #define Rs      {Segment::Kind::Rs,         4}
+#define Rt      {Segment::Kind::Rt,         4}
+#define Rt2     {Segment::Kind::Rt2,        4}
 #define CONST   {Segment::Kind::CONST,     12}
 #define IMM(v)  {Segment::Kind::IMM,        v}
 #define SIMM    {Segment::Kind::SHIFT_IMM,  7}
@@ -129,26 +131,43 @@ INST( ldmdb,   "ldmdb<c>\t<Rn><w>, <regs>",                {COND, B(100100), W, 
 INST( ldmib,   "ldmib<c>\t<Rn><w>, <regs>",                {COND, B(100110), W, B(1), Rn, REGS})
 
 // TODO: maybe add a special case for imm == 0
-INST(   ldr,   "ldr<c>\t<Rs>, [<Rn>, #<u><imm>]<w>",       {COND, B(0101), U, B(0), W, B(1), Rn, Rs, IMM(12)})
-INSTALT(ldr,   "ldr<c>\t<Rs>, [<Rn>], #<u><imm>",          {COND, B(0100), U, B(001), Rn, Rs, IMM(12)})
+INST(   ldr,   "ldr<c>\t<Rt>, [<Rn>, #<u><imm>]<w>",       {COND, B(0101), U, B(0), W, B(1), Rn, Rt, IMM(12)})
+INSTALT(ldr,   "ldr<c>\t<Rt>, [<Rn>], #<u><imm>",          {COND, B(0100), U, B(001), Rn, Rt, IMM(12)})
 
-INSTALT(ldr,   "ldr<c>\t<Rs>, label",                      {COND, B(010110011111), Rs, IMM(12)})
-INSTALT(ldr,   "ldr<c>\t<Rs>, -label",                     {COND, B(010100011111), Rs, IMM(12)})
+INSTALT(ldr,   "ldr<c>\t<Rt>, label",                      {COND, B(010110011111), Rt, IMM(12)})
+INSTALT(ldr,   "ldr<c>\t<Rt>, -label",                     {COND, B(010100011111), Rt, IMM(12)})
 
-INSTALT(ldr,   "ldr<c>\t<Rs>, [<Rn>, <u><Rm><simm>]<w>",   {COND, B(0111), U, B(0), W, B(1), Rn, Rs, SIMM, B(0), Rm})
-INSTALT(ldr,   "ldr<c>\t<Rs>, [<Rn>], <u><Rm><simm>",      {COND, B(0110), U, B(001), Rn, Rs, SIMM, B(0), Rm})
+INSTALT(ldr,   "ldr<c>\t<Rt>, [<Rn>, <u><Rm><simm>]<w>",   {COND, B(0111), U, B(0), W, B(1), Rn, Rt, SIMM, B(0), Rm})
+INSTALT(ldr,   "ldr<c>\t<Rt>, [<Rn>], <u><Rm><simm>",      {COND, B(0110), U, B(001), Rn, Rt, SIMM, B(0), Rm})
 
-INST(   ldrb,  "ldrb<c>\t<Rs>, [<Rn>, #<u><imm>]<w>",      {COND, B(0101), U, B(1), W, B(1), Rn, Rs, IMM(12)})
-INSTALT(ldrb,  "ldrb<c>\t<Rs>, [<Rn>], #<u><imm>",         {COND, B(0100), U, B(101), Rn, Rs, IMM(12)})
+INST(   ldrb,  "ldrb<c>\t<Rt>, [<Rn>, #<u><imm>]<w>",      {COND, B(0101), U, B(1), W, B(1), Rn, Rt, IMM(12)})
+INSTALT(ldrb,  "ldrb<c>\t<Rt>, [<Rn>], #<u><imm>",         {COND, B(0100), U, B(101), Rn, Rt, IMM(12)})
 
-INSTALT(ldrb,  "ldrb<c>\t<Rs>, label",                     {COND, B(010111011111), Rs, IMM(12)})
-INSTALT(ldrb,  "ldrb<c>\t<Rs>, -label",                    {COND, B(010101011111), Rs, IMM(12)})
+INSTALT(ldrb,  "ldrb<c>\t<Rt>, label",                     {COND, B(010111011111), Rt, IMM(12)})
+INSTALT(ldrb,  "ldrb<c>\t<Rt>, -label",                    {COND, B(010101011111), Rt, IMM(12)})
 
 INSTALT(ldrb,  "ldrb<c>\t<Rs>, [<Rn>, <u><Rm><simm>]<w>",  {COND, B(0111), U, B(1), W, B(1), Rn, Rs, SIMM, B(0), Rm})
 INSTALT(ldrb,  "ldrb<c>\t<Rs>, [<Rn>], <u><Rm><simm>",     {COND, B(0110), U, B(101), Rn, Rs, SIMM, B(0), Rm})
 
 INST(   ldrbt, "ldrbt<c>\t<Rs>, [<Rn>], #<u><imm>",        {COND, B(0100), U, B(111), Rn, Rs, IMM(12)})
 INSTALT(ldrbt, "ldrbt<c>\t<Rs>, [<Rn>], <u><Rm><simm>",    {COND, B(0110), U, B(111), Rn, Rs, SIMM, B(0), Rm})
+
+INST(   ldrd,  "ldrd<c>\t<Rt>, <Rt2>, [<Rn>, #<u><cimm>]<w>", {COND, B(0001), U, B(1), W, B(0), Rn, Rt, IMM(4), B(1101), IMM(4)})
+INSTALT(ldrd,  "ldrd<c>\t<Rt>, <Rt2>, [<Rn>], #<u><cimm>",    {COND, B(0000), U, B(100), Rn, Rt, IMM(4), B(1101), IMM(4)})
+INSTALT(ldrd,  "ldrd<c>\t<Rt>, <Rt2>, <u>label",              {COND, B(0001), U, B(1001111), Rt, IMM(4), B(1101), IMM(4)})
+INSTALT(ldrd,  "ldrd<c>\t<Rt>, <Rt2>, [<Rn>, <u><Rm>]<w>",    {COND, B(0001), U, B(0), W, B(0), Rn, Rt, B(00001101), Rm})
+INSTALT(ldrd,  "ldrd<c>\t<Rt>, <Rt2>, [<Rn>], <u><Rm>",       {COND, B(0000), U, B(000), Rn, Rt, B(00001101), Rm})
+
+INST(  ldrex,  "ldrex<c>\t<Rt>, [<Rn>]",                   {COND, B(00011001), Rn, Rt, B(111110011111)})
+INST( ldrexb,  "ldrexb<c>\t<Rt>, [<Rn>]",                  {COND, B(00011101), Rn, Rt, B(111110011111)})
+INST( ldrexd,  "ldrexd<c>\t<Rt>, <Rt2>, [<Rn>]",           {COND, B(00011011), Rn, Rt, B(111110011111)})
+INST( ldrexh,  "ldrexh<c>\t<Rt>, [<Rn>]",                  {COND, B(00011111), Rn, Rt, B(111110011111)})
+
+INST(   ldrh,  "ldrh<c>\t<Rt>, [<Rn>, #<u><cimm>]<w>",     {COND, B(0001), U, B(1), W, B(1), Rn, Rt, IMM(4), B(1011), IMM(4)})
+INSTALT(ldrh,  "ldrh<c>\t<Rt>, [<Rn>], #<u><cimm>",        {COND, B(0000), U, B(101), Rn, Rt, IMM(4), B(1011), IMM(4)})
+INSTALT(ldrh,  "ldrh<c>\t<Rt>, <u>label",                  {COND, B(0001), U, B(1011111), Rt, IMM(4), B(1011), IMM(4)})
+
+INST(   yeild, "yield<c>",                                 {COND, B(0011001000001111000000000001)})
 
 #undef INST
 #undef INSTALT
@@ -162,6 +181,8 @@ INSTALT(ldrbt, "ldrbt<c>\t<Rs>, [<Rn>], <u><Rm><simm>",    {COND, B(0110), U, B(
 #undef Rd
 #undef Rm
 #undef Rs
+#undef Rt
+#undef Rt2
 #undef CONST
 #undef IMM
 #undef CIMM

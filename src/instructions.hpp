@@ -28,9 +28,11 @@ struct Segment {
     Rd,
     Rm,
     Rs,
+    Rt,
+    Rt2,
     CONST,  // 12 bit modified constant
     IMM,    // immediate
-    CIMM,   // composite immediate (two immediate fields that are concatenated)
+    CIMM,  // composite immediate (two immediate fields that are concatenated)
     SHIFT_IMM,   // shift by immediate
     SHIFT_TYPE,  // shift type (shift by register)
     LSB,
@@ -122,6 +124,8 @@ struct Instruction_Format {
            : var == "Rd"    ? Segment::Kind::Rd
            : var == "Rm"    ? Segment::Kind::Rm
            : var == "Rs"    ? Segment::Kind::Rs
+           : var == "Rt"    ? Segment::Kind::Rt
+           : var == "Rt2"   ? Segment::Kind::Rt2
            : var == "const" ? Segment::Kind::CONST
            : var == "imm"   ? Segment::Kind::IMM
            : var == "cimm"  ? Segment::Kind::CIMM
@@ -156,7 +160,7 @@ struct Instruction_Format {
     assert(kind != Segment::Kind::NONE);
 
     // fields that are composition of other fields
-    if (kind == Segment::Kind::WIDTH || kind == Segment::Kind::CIMM) {
+    if (kind == Segment::Kind::WIDTH || kind == Segment::Kind::CIMM) { 
       uint32_t mask = 0u;
       for (const auto& [segment, segment_mask] :
            std::views::zip(segments, masks)) {
@@ -174,12 +178,14 @@ struct Instruction_Format {
     for (const auto& [segment, mask] : std::views::zip(segments, masks)) {
       assert(segment.kind != Segment::Kind::NONE);
 
+      if (segment.kind == Segment::Kind::Rt && kind == Segment::Kind::Rt2)
+        return std::make_pair(kind, mask);
+
       if (segment.kind == kind)
         return std::make_pair(kind, mask);
     }
 
-    __builtin_trap();
-    assert(false);
+    UNREACHABLE();
   }
 };
 
@@ -290,7 +296,7 @@ find_format_segment_literal(const Instruction_Format& instr,
       }
     }
   }
-  __builtin_trap();
+  UNREACHABLE();
 }
 
 static consteval Instruction_Format::Fmt_Str segment_literal(Segment::Kind kind,
@@ -305,30 +311,8 @@ static consteval Instruction_Format::Fmt_Str segment_literal(Segment::Kind kind,
   };
 
   switch (kind) {
-    case Segment::Kind::NONE:
-    case Segment::Kind::BITS:
-    case Segment::Kind::COND:
-    case Segment::Kind::Rn:
-    case Segment::Kind::Rd:
-    case Segment::Kind::Rm:
-    case Segment::Kind::Rs:
-    case Segment::Kind::CONST:
-    case Segment::Kind::IMM:
-    case Segment::Kind::CIMM:
-    case Segment::Kind::SHIFT_IMM:
-    case Segment::Kind::LSB:
-    case Segment::Kind::MSB:
-    case Segment::Kind::WIDTH:
-    case Segment::Kind::BOPT:
-    case Segment::Kind::IOPT:
-    case Segment::Kind::REGS:
-    case Segment::Kind::COPROC:
-    case Segment::Kind::OPC1:
-    case Segment::Kind::OPC2:
-    case Segment::Kind::CRd:
-    case Segment::Kind::CRn:
-    case Segment::Kind::CRm:
-      __builtin_trap();
+    default:
+      UNREACHABLE();
 
     case Segment::Kind::S:
       return value ? FS("s") : FS("");

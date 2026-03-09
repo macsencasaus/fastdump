@@ -1,4 +1,5 @@
 #include "emit.hpp"
+#include "instructions.hpp"
 
 #include <fstream>
 #include <print>
@@ -49,8 +50,12 @@ static void emit_segment_printer(std::ofstream& f,
     case Segment::Kind::Rn:
     case Segment::Kind::Rd:
     case Segment::Kind::Rm:
-    case Segment::Kind::Rs: {
+    case Segment::Kind::Rs:
+    case Segment::Kind::Rt: {
       std::print(f, "  arena.append(general_reg_field[a]);\n");
+    } break;
+    case Segment::Kind::Rt2: {
+      std::print(f, "  arena.append(general_reg_field[a+1]);\n");
     } break;
     case Segment::Kind::CONST: {
       std::print(f,
@@ -112,6 +117,8 @@ static void emit_segment_printer(std::ofstream& f,
 static void emit_printer(std::ofstream& f,
                          const Decision_Tree::Leaf_Node* node,
                          size_t id) {
+  assert(node);
+
   std::print(f,
              "static void print_{}(String_Arena &arena, uint32_t instr) {{\n"
              "  uint32_t a, b; (void)instr; (void)a; (void)b;\n",
@@ -140,7 +147,6 @@ static void emit_printer(std::ofstream& f,
       if (ch == '<') {
         ++fmt;
         auto var = read_var(fmt);
-        // std::println("var: {}, {}", var, var.size());
         const auto [kind, segment_mask] = instr.mask(var);
 
         fmt += var.size();
@@ -158,27 +164,22 @@ static void emit_printer(std::ofstream& f,
     }
   };
 
-  if (node->instr_idxs.size() == 1) {
+  const size_t instr_count = node->instr_idxs.size();
+
+  if (instr_count == 1) {
     emit_parser(node->instr_idxs[0].second);
   } else {
-    uint32_t else_idx;
-    for (size_t i = 0; i < node->instr_idxs.size(); ++i) {
-      uint32_t mask_value = node->instr_idxs[i].first;
-      uint32_t idx = node->instr_idxs[i].second;
+    for (auto [mask, idx] :
+         node->instr_idxs.first(instr_count - 1)) {
 
-      if (node->instr_idxs[i].first == 0) {
-        else_idx = idx;
-        continue;
-      }
-
-      std::print(f, "if ((instr & {:#034b}u) == {:#034b}u) {{\n", node->mask,
-                 mask_value);
+      std::print(f, "if ((instr & {:#034b}u) == {:#034b}u) {{\n", mask.mask,
+                 mask.value);
       emit_parser(idx);
       std::print(f, "}} else ");
     }
 
     std::print(f, "{{\n");
-    emit_parser(else_idx);
+    emit_parser(node->instr_idxs.back().second);
     std::print(f, "}}\n");
   }
 

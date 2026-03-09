@@ -28,7 +28,6 @@ Decision_Tree::Node* Decision_Tree::General_Node::build(
 
   uint32_t discriminating_bits = 0u;
 
-  // TODO: optimize
   for (uint8_t bit = 0; bit < 32; ++bit) {
     if (!is_bit_set(allowed_bits, bit))
       continue;
@@ -111,8 +110,9 @@ Decision_Tree::Node* Decision_Tree::General_Node::build(
 
 Decision_Tree::Node* Decision_Tree::Leaf_Node::build(Decision_Tree& tree,
                                                      uint32_t idx) {
-  auto instr = tree.alloc.new_object<std::pair<uint32_t, uint32_t>>(0, idx);
-  return tree.alloc.new_object<Node>(Leaf_Node{std::span(instr, 1), 0u});
+  auto instr = tree.alloc.new_object<std::pair<Instruction_Mask, uint32_t>>(
+      Instruction_Mask{}, idx);
+  return tree.alloc.new_object<Node>(Leaf_Node{std::span(instr, 1zu)});
 }
 
 Decision_Tree::Node* Decision_Tree::Leaf_Node::build(
@@ -120,48 +120,30 @@ Decision_Tree::Node* Decision_Tree::Leaf_Node::build(
     const std::bitset<instruction_count>& set) {
   std::println("--- Special ---");
 
-  uint32_t ors = 0u, ands = std::numeric_limits<uint32_t>::max();
+  const uint32_t instr_count = static_cast<uint32_t>(set.count());
+  std::println("count: {}", instr_count);
 
-  for (uint32_t i = 0; i < instruction_count; ++i) {
-    if (!set[i])
-      continue;
-    uint32_t v = tree.masks[i].value;
-    ors |= v;
-    ands &= v;
-  }
-
-  uint32_t discriminating_bits = ors ^ ands;
-
-  assert(discriminating_bits != 0);
-
-  std::println("different_bits: {:032b}", discriminating_bits);
-
-  // minimal contiguous mask
-
-  int lo = std::countr_zero(discriminating_bits);
-  int hi = 31 - std::countl_zero(discriminating_bits);
-
-  uint32_t mask = static_cast<uint32_t>(((1ull << (hi - lo + 1)) - 1) << lo);
-
-  std::println("mask:           {:032b}", mask);
-
-  uint32_t instr_count = static_cast<uint32_t>(set.count());
   auto instrs_idxs =
-      tree.alloc.allocate_object<std::pair<uint32_t, uint32_t>>(instr_count);
+      tree.alloc.allocate_object<std::pair<Instruction_Mask, uint32_t>>(
+          instr_count);
 
   uint32_t ch = 0;
   for (uint32_t i = 0; i < instruction_count; ++i) {
     if (!set[i])
       continue;
-    uint32_t v = tree.masks[i].value;
-    uint32_t mask_value = mask & v;
-    instrs_idxs[ch++] = std::make_pair(mask_value, i);
+    auto mask = tree.masks[i];
+    instrs_idxs[ch++] = std::make_pair(mask, i);
 
-    std::println("                {:032b} : {:032b}", v, mask_value);
+    std::println("                {:032b} : {:032b}", mask.mask, mask.value);
   }
 
+  std::sort(instrs_idxs, instrs_idxs + instr_count,
+            [](const auto& a, const auto& b) -> bool {
+              return std::popcount(a.first.mask) > std::popcount(b.first.mask);
+            });
+
   return tree.alloc.new_object<Node>(
-      Leaf_Node{std::span(instrs_idxs, instr_count), mask});
+      Leaf_Node{std::span(instrs_idxs, instr_count)});
 }
 
 Decision_Tree::Decision_Tree(const Instruction_Masks& masks,

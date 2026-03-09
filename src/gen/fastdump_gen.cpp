@@ -6,13 +6,6 @@
 #include "decision_tree.hpp"
 #include "emit.hpp"
 
-#define UNREACHABLE()                                                      \
-  do {                                                                     \
-    fprintf(stderr, "UNREACHABLE CODE REACHED: %s:%d in %s()\n", __FILE__, \
-            __LINE__, __func__);                                           \
-    abort();                                                               \
-  } while (0)
-
 static constexpr auto construct_masks(const auto& instruction_formats) {
   std::array<Instruction_Mask, instruction_formats.size()> masks;
 
