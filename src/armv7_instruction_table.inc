@@ -166,6 +166,56 @@ INST( ldrexh,  "ldrexh<c>\t<Rt>, [<Rn>]",                  {COND, B(00011111), R
 INST(   ldrh,  "ldrh<c>\t<Rt>, [<Rn>, #<u><cimm>]<w>",     {COND, B(0001), U, B(1), W, B(1), Rn, Rt, IMM(4), B(1011), IMM(4)})
 INSTALT(ldrh,  "ldrh<c>\t<Rt>, [<Rn>], #<u><cimm>",        {COND, B(0000), U, B(101), Rn, Rt, IMM(4), B(1011), IMM(4)})
 INSTALT(ldrh,  "ldrh<c>\t<Rt>, <u>label",                  {COND, B(0001), U, B(1011111), Rt, IMM(4), B(1011), IMM(4)})
+INSTALT(ldrh,  "ldrh<c>\t<Rt>, [<Rn>, #<u><Rm>]<w>",       {COND, B(0001), U, B(0), W, B(1), Rn, Rt, B(00001011), Rm})
+INSTALT(ldrh,  "ldrh<c>\t<Rt>, [<Rn>], <u><Rm>",           {COND, B(0000), U, B(001), Rn, Rt, B(00001011), Rm})
+
+INST(   ldrht, "ldrht<c>\t<Rt>, [<Rn>], #<u><cimm>",       {COND, B(0000), U, B(111), Rn, Rt, IMM(4), B(1011), IMM(4)})
+INSTALT(ldrht, "ldrht<c>\t<Rt>, [<Rn>], <u><Rm>",          {COND, B(0000), U, B(011), Rn, Rt, B(00001011), Rm})
+
+INST(   ldrsb, "ldrsb<c>\t<Rt>, [<Rn>, #<u><cimm>]<w>",    {COND, B(0001), U, B(1), W, B(1), Rn, Rt, IMM(4), B(1101), IMM(4)})
+INSTALT(ldrsb, "ldrsb<c>\t<Rt>, [<Rn>], #<u><cimm>",       {COND, B(0000), U, B(101), Rn, Rt, IMM(4), B(1101), IMM(4)})
+INSTALT(ldrsb, "ldrsb<c>\t<Rt>, <u>label",                 {COND, B(0001), U, B(1011111), Rt, IMM(4), B(1101), IMM(4)})
+INSTALT(ldrsb, "ldrsb<c>\t<Rt>, [<Rn>, <u><Rm>]<w>",       {COND, B(0001), U, B(0), W, B(1), Rn, Rt, B(00001101), Rm})
+INSTALT(ldrsb, "ldrsb<c>\t<Rt>, [<Rn>], <u><Rm>",          {COND, B(0000), U, B(001), Rn, Rt, B(00001101), Rm})
+
+INST(   ldrsbt,"ldrsbt<c>\t<Rt>, [<Rn>], #<u><cimm>",      {COND, B(0000), U, B(111), Rn, Rt, IMM(4), B(1101), IMM(4)})
+INSTALT(ldrsbt,"ldrsbt<c>\t<Rt>, [<Rn>], <u><Rm>",         {COND, B(0000), U, B(011), Rn, Rt, B(00001101), Rm})
+
+INST(   ldrsh, "ldrsh<c>\t<Rt>, [<Rn>, #<u><cimm>]<w>",    {COND, B(0001), U, B(1), W, B(1), Rn, Rt, IMM(4), B(1111), IMM(4)})
+INSTALT(ldrsh, "ldrsh<c>\t<Rt>, [<Rn>], #<u><cimm>",       {COND, B(0000), U, B(101), Rn, Rt, IMM(4), B(1111), IMM(4)})
+INSTALT(ldrsh, "ldrsh<c>\t<Rt>, <u>label",                 {COND, B(0001), U, B(1011111), Rt, IMM(4), B(1111), IMM(4)})
+INSTALT(ldrsh, "ldrsh<c>\t<Rt>, [<Rn>, #<u><Rm>]<w>",      {COND, B(0001), U, B(0), W, B(1), Rn, Rt, B(00001111), Rm})
+INSTALT(ldrsh, "ldrsh<c>\t<Rt>, [<Rn>], #<u><Rm>",         {COND, B(0000), U, B(001), Rn, Rt, B(00001111), Rm})
+
+INST(   ldrsht,"ldrsht<c>\t<Rt>, [<Rn>], #<u><cimm>",      {COND, B(0000), U, B(111), Rn, Rt, IMM(4), B(1111), IMM(4)})
+INSTALT(ldrsht,"ldrsht<c>\t<Rt>, [<Rn>], <u><Rm>",         {COND, B(0000), U, B(011), Rn, Rt, B(00001111), Rm})
+
+INST(   ldrt,  "ldrt<c>\t<Rt>, [<Rn>], #<u><imm>",         {COND, B(0100), U, B(011), Rn, Rt, IMM(12)})
+INSTALT(ldrt,  "ldrt<c>\t<Rt>, [<Rn>], <u><Rm><simm>",     {COND, B(0110), U, B(011), Rn, Rt, SIMM, B(0), Rm})
+
+INST(   lsl,   "lsl<s><c>\t<Rd>, <Rm>, #<imm>",            {COND, B(0001101), S, B(0000), Rd, IMM(5), B(000), Rm})
+INSTALT(lsl,   "lsl<s><c>\t<Rd>, <Rn>, <Rm>",              {COND, B(0001101), S, B(0000), Rd, Rm, B(0001), Rn})
+
+INST(   lsr,   "lsr<s><c>\t<Rd>, <Rm>, #<imm>",            {COND, B(0001101), S, B(0000), Rd, IMM(5), B(010), Rm})
+INSTALT(lsr,   "lsr<s><c>\t<Rd>, <Rn>, <Rm>",              {COND, B(0001101), S, B(0000), Rd, Rm, B(0011), Rn})
+
+INST(   mcr,   "mcr<c>\tp<coproc>, #<opc1>, <Rt>, c<CRn>, c<CRm>, #<opc2>", {COND, B(1110), OPC1, CRn, Rt, COPROC, OPC2, B(1), CRm})
+INST(   mcr2,  "mcr2\tp<coproc>, #<opc1>, <Rt>, c<CRn>, c<CRm>, #<opc2>",   {B(11111110), OPC1, CRn, Rt, COPROC, OPC2, B(1), CRm})
+
+INST(   mcrr,  "mcrr<c>\tp<coproc>, #<opc1>, <Rt>, <Rs>, c<CRm>", {COND, B(11000100), Rs, Rt, COPROC, OPC1, CRm})
+INST(   mcrr2, "mcrr2\tp<coproc>, #<opc1>, <Rt>, <Rs>, c<CRm>",   {B(111111000100), Rs, Rt, COPROC, OPC1, CRm})
+
+INST(   mla,   "mla<s><c>\t<Rd>, <Rn>, <Rm>, <Rs>",        {COND, B(0000001), S, Rd, Rs, Rm, B(1001), Rn})
+INST(   mls,   "mls<c>\t<Rd>, <Rn>, <Rm>, <Rs>",           {COND, B(00000110), Rd, Rs, Rm, B(1001), Rn})
+
+INST(   mov,   "mov<s><c>\t<Rd>, #<const>",                {COND, B(0011101), S, B(0000), Rd, CONST})
+INSTALT(mov,   "movw<c>\t<Rd>, #<cimm>",                   {COND, B(00110000), IMM(4), Rd, IMM(12)})
+INSTALT(mov,   "mov<s><c>\t<Rd>, <Rm>",                    {COND, B(0001101), S, B(0000), Rd, B(00000000), Rm})
+
+INST(   movt,  "movt<c>\t<Rd>, #<cimm>",                   {COND, B(00110100), IMM(4), Rd, IMM(12)})
+
+INST(   mrc,   "mrc<c>\tp<coproc>, #<opc1>, <Rt>, <CRn>, <CRm>, #<opc2>", {COND, B(1110), OPC1, CRn, Rt, COPROC, OPC2, B(1), CRm})
+INST(   mrc2,  "mrc2\tp<coproc>, #<opc1>, <Rt>, <CRn>, <CRm>, #<opc2>",   {B(11111110), OPC1, CRn, Rt, COPROC, OPC2, B(1), CRm})
 
 INST(   yeild, "yield<c>",                                 {COND, B(0011001000001111000000000001)})
 
