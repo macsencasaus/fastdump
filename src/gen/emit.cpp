@@ -87,7 +87,6 @@ static void emit_segment_printer(std::ofstream& f,
     case Segment::Kind::REGS: {
       std::print(f, "  arena.append('{{');\n");
       std::print(f,
-                 "  #pragma clang loop unroll(full)\n"
                  "  for (size_t i = 0; i < 16; ++i) {{\n"
                  "    if (i != 0) arena.append(\", \");\n"
                  "    if (a & (1u << i)) arena.append(general_reg_field[i]);\n"
